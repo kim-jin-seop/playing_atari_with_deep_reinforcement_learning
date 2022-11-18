@@ -3,8 +3,11 @@ import random
 
 
 class DQN(nn.Module):
+
     def __init__(self, actions: int):
         super(DQN, self).__init__()
+
+        self.action_count = actions
         # 4 84 * 84
         self.conv_1 = nn.Sequential(
             nn.Conv2d(in_channels=4, out_channels=16, kernel_size=8, stride=4),
@@ -28,15 +31,14 @@ class DQN(nn.Module):
     def forward(self, x):
         x = self.conv_1(x)
         x = self.conv_2(x)
-        x = x.view(-1)
+        x = x.view(x.size()[0], -1)
         x = self.fc_1(x)
         x = self.out_layer(x)
         return x
 
     def sample_action(self, obs, epsilon):
         out = self.forward(obs)
-        coin = random.random()
-        if coin < epsilon:
-            return random.randint(0, 1)
+        if random.random() < epsilon:
+            return random.randint(0, self.action_count-1)
         else:
             return out.argmax().item()
