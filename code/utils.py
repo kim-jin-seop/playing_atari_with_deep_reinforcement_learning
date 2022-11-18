@@ -1,119 +1,134 @@
 import gym
+from gym.spaces import Box
+from gym.wrappers import Monitor
+
+import cv2
+import numpy as np
+import pandas as pd
+
 import torch
+import torch.optim as optim
+import torch.nn.functional as F
 
 import networks
 from memory import ReplayBuffer
-from gym.spaces import Box
-import torch.optim as optim
-import torch.nn.functional as F
-import cv2
-import numpy as np
 
-memory_size = 100000
-print_interval = 100
 
-class FrmDwSmpl(gym.ObservationWrapper):
+# Image : Size, RGB to Gray
+class FramePreprocessing(gym.ObservationWrapper):
     def __init__(self, env):
-        super(FrmDwSmpl, self).__init__(env)
+        super(FramePreprocessing, self).__init__(env)
         self.observation_space = Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
-        self._width = 84
-        self._height = 84
 
     def observation(self, observation):
-        frame = cv2.cvtColor(observation, cv2.COLOR_RGB2GRAY)
-        frame = cv2.resize(frame, (self._width, self._height), interpolation=cv2.INTER_AREA)
-        return frame[:, :, None]
+        observation = cv2.cvtColor(observation, cv2.COLOR_RGB2GRAY)
+        observation = cv2.resize(observation, (84, 84), interpolation=cv2.INTER_AREA)
+        return observation[:, :, None]
 
-class Img2Trch(gym.ObservationWrapper):
+
+# Image : H W C -> C H W
+class ChangeImageAxis(gym.ObservationWrapper):
     def __init__(self, env):
-        super(Img2Trch, self).__init__(env)
+        super(ChangeImageAxis, self).__init__(env)
         obs_shape = self.observation_space.shape
         self.observation_space = Box(low=0.0, high=1.0, shape=(obs_shape[::-1]), dtype=np.float32)
 
     def observation(self, observation):
-        return np.moveaxis(observation, 2, 0)
+        return np.moveaxis(observation, -1, 0)
 
 
-class FrmBfr(gym.ObservationWrapper):
-    def __init__(self, env, num_steps, dtype=np.float32):
-        super(FrmBfr, self).__init__(env)
-        obs_space = env.observation_space
-        self._dtype = dtype
-        self.observation_space = Box(obs_space.low.repeat(num_steps, axis=0),
-                                     obs_space.high.repeat(num_steps, axis=0), dtype=self._dtype)
+class FromBuffer(gym.ObservationWrapper):
+    def __init__(self, env):
+        super(FromBuffer, self).__init__(env)
+        self.temp = None
+        self.observation_space = Box(env.observation_space.low.repeat(4, axis=0),
+                                     env.observation_space.high.repeat(4, axis=0), dtype=np.float32)
 
     def reset(self):
-        self.buffer = np.zeros_like(self.observation_space.low, dtype=self._dtype)
+        self.temp = np.zeros_like(self.observation_space.low, dtype=np.float32)
         return self.observation(self.env.reset())
 
     def observation(self, observation):
-        self.buffer[:-1] = self.buffer[1:]
-        self.buffer[-1] = observation
-        return self.buffer
-
-class NormFlts(gym.ObservationWrapper):
-    def observation(self, obs):
-        return np.array(obs).astype(np.float32) / 255.0
+        self.temp[:-1] = self.temp[1:]
+        self.temp[-1] = observation
+        return self.temp
 
 
-def make_env(env_name):
+# image Scale [0 255] -> [0, 1]
+class ImageScaling(gym.ObservationWrapper):
+    def observation(self, observation):
+        return np.array(observation).astype(np.float32) / 255.0
+
+
+def make_env(env_name: str, vidio_path):
     env = gym.make(env_name)
-    env = FrmDwSmpl(env)
-    env = Img2Trch(env)
-    env = FrmBfr(env, 4)
-    env = NormFlts(env)
+    env = FramePreprocessing(env)
+    env = ChangeImageAxis(env)
+    env = FromBuffer(env)
+    env = ImageScaling(env)
+    env = Monitor(env, vidio_path, force=True)
     return env
 
 
-def train(env_name: str, action_count: int, learning_rate=1e-5,
-          epochs: int = 3000, batch_size: int = 32, gamma: float = 0.98):
-    env = make_env(env_name)
+def experiment(env_name: str, action_num: int, learning_rate=1e-5,
+               epochs: int = 10000, batch_size: int = 32, gamma: float = 0.98,
+               eps_init: float = 1, eps_grad: float = 0.2, eps_min: float = 0.01,
+               csv_name: str = 'test.csv', vidio_path: str = './monitor'):
+    div = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    env = make_env(env_name, vidio_path=vidio_path)
+    memory = ReplayBuffer(20000)
 
-    q = networks.DQN(action_count)
-    q_target = networks.DQN(action_count)
-    q_target.load_state_dict(q.state_dict())
-    memory = ReplayBuffer(memory_size)
+    q = networks.DQN(action_num).to(div)
+    q_target = networks.DQN(action_num).to(div)
 
-    print_score = 0.0
     optimizer = optim.Adam(q.parameters(), lr=learning_rate)
 
+    episode_list = []
+    reward_list = []
+    eps_list = []
     for epoch in range(epochs):
-        eps = max(0.01, 0.08 - 0.01 * (epoch / 200))
+        print_score = 0.0
+        eps = max(eps_min, eps_init - 0.01 * (epoch / (1 / eps_grad)))
         state = env.reset()
-        finish = False
 
-        while not finish:
-            action = q.sample_action(torch.from_numpy(state).float().unsqueeze(0), eps)
-            env.render()
+        while True:
+            action = q.sample_action(torch.from_numpy(np.float32(state)).unsqueeze(0).to(div), eps)
             next_state, reward, finish, _ = env.step(action)
-            f_mask = 0.0 if finish else 1.0
-            memory.put(state, action, reward, next_state, f_mask)
+            memory.put(state, action, reward, next_state, finish)
             state = next_state
             print_score += reward
 
-        if len(memory) > 2000:
-            update(q, q_target, memory, optimizer, batch_size, gamma)
+            if len(memory) > 10000:
+                update(q, q_target, memory, optimizer, epoch, div, batch_size, gamma)
 
-        if epoch != 0 and epoch % print_interval == 0:
-            q_target.load_state_dict(q.state_dict())
-            print("n_episode :{}, score : {:.1f}, n_buffer : {}, eps : {:.1f}%".format(
-                epoch, print_score / print_interval, len(memory), eps * 100))
-            print_score = 0
+            if finish:
+                break
+        print("n_episode :{}, score : {:.1f}, eps : {:.1f}%".format(epoch, print_score, eps * 100))
+        episode_list.append(epoch)
+        reward_list.append(print_score)
+        eps_list.append(eps * 100)
 
-
-def update(q, q_target, memory, optimizer, batch_size=32, gamma=0.98):
-    for i in range(10):
-        state, action, reward, next_state, finish = memory.sample(batch_size)
-        q_out = q(state)
-        q_a = torch.gather(q_out, 1, action.unsqueeze(-1))
-
-        max_q_prime = q_target(next_state).max(1)[0].unsqueeze(1)
-        target = reward.unsqueeze(-1) + gamma * max_q_prime * finish.unsqueeze(-1)
-        loss = F.mse_loss(q_a, target)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    df = pd.DataFrame({'episode': episode_list, 'reward': reward_list, 'epsilon': eps_list})
+    df.to_csv(csv_name, index=False, mode='w')
 
 
-train("Pong-v4", 4)
+def update(q, q_target, memory, optimizer, epoch, div, batch_size=32, gamma=0.98):
+    if epoch % 1000:
+        q_target.load_state_dict(q.state_dict())
+
+    state, action, reward, next_state, finish = memory.sample(batch_size)
+    state = torch.from_numpy(np.float32(state)).to(div)
+    action = torch.from_numpy(np.int64(action)).to(div)
+    reward = torch.from_numpy(reward).to(div)
+    next_state = torch.from_numpy(next_state).to(div)
+    finish = torch.from_numpy(finish).to(div)
+    q_out = q(state)
+    q_a = q_out.gather(1, action.unsqueeze(-1)).squeeze(-1)
+    max_next_q = q_target(next_state).max(1)[0]
+
+    target = reward + gamma * max_next_q * (1 - finish)
+    loss = F.mse_loss(q_a, target.data.to(div))
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
