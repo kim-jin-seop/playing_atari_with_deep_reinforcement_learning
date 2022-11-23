@@ -1,3 +1,6 @@
 
 *.dat
 *.pyc
+*.json
+*.mp4
+*.csv
