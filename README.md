@@ -1,5 +1,3 @@
-# playing_atari_with_deep_reinforcement_learning
-
 ## INDEX
 - [Project Purpose](#project-purpose)
 - [Environment](#environment)
@@ -69,3 +67,4 @@ It is implemented in [utils.py](./code/utils.py) as experience function.
 It is implemented in [network.py](./code/networks.py).
 
 ## Performance
+I 
