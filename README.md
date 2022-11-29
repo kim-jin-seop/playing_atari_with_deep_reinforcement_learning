@@ -70,6 +70,6 @@ It is implemented in [network.py](./code/networks.py).
 - Result of learning 7 atari games as DQN
 ![experiment_1](./img/experiment_1.png)
 - Hyper parameter epsilon tuning for BreakOut game<div>
-  <img src="./img/experiment_2.png" style="width: 50%; height=auto;">
-  <img src="./img/experiment_3.png" style="width: 50%; height=auto;">
+  <img src="./img/experiment_2.png" style="width: 40%; height=auto;">
+  <img src="./img/experiment_3.png" style="width: 40%; height=auto;">
 </div>
