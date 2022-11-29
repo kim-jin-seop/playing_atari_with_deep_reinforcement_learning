@@ -15,8 +15,8 @@
   <img src="https://user-images.githubusercontent.com/33629459/204559552-5a247675-a4a4-4b99-9e2f-b894c47d31e0.mp4">
   <img src="https://user-images.githubusercontent.com/33629459/204559763-b5bd2840-c215-4a63-83a4-04cd251940f6.mp4">
   <img src="https://user-images.githubusercontent.com/33629459/204559927-7afd441b-3743-47c0-89aa-7dfcb3e183fd.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204561075-49832f5e-a5e4-4b18-be5c-afdd694c6418.mp4">
 </div>
-<img src="https://user-images.githubusercontent.com/33629459/204560084-25783678-7eae-4d50-a2a3-a0dcac596796.mp4">
 The ultimate goal of this project is to implement atari game player by reinforcement learning algorithm DQN.
 
 ## Environment
