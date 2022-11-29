@@ -1,3 +1,8 @@
+# playing_atari_with_deep_reinforcement_learning
+<div>
+  <img src="https://user-images.githubusercontent.com/33629459/204558192-69946810-c81f-46b7-b76e-2f99cf0dc280.mp4">
+</div>
+
 ## INDEX
 - [Project Purpose](#project-purpose)
 - [Environment](#environment)
@@ -59,17 +64,17 @@ resizing it to a 84 x 84 pixel image using opencv library.
 
 It is implemented in [utils.py](./code/utils.py) as make_env function.
 ### Algorithm
-![algorithm](./img/dqn.png)  
+![algorithm](resource/img/dqn.png)  
 It is implemented in [utils.py](./code/utils.py) as experience function.
 
 ### Model
-![algorithm](./img/network.png)  
+![algorithm](./resource/img/network.png)  
 It is implemented in [network.py](./code/networks.py).
 
 ## Performance
 - Result of learning 7 atari games as DQN
-![experiment_1](./img/experiment_1.png)
+![experiment_1](resource/img/experiment_1.png)
 - Hyper parameter epsilon tuning for BreakOut game<div>
-  <img src="./img/experiment_2.png" style="width: 47%; height=auto;">
-  <img src="./img/experiment_3.png" style="width: 47%; height=auto;">
+  <img src="./resource/img/experiment_2.png" style="width: 47%; height=auto;">
+  <img src="./resource/img/experiment_3.png" style="width: 47%; height=auto;">
 </div>
