@@ -67,4 +67,9 @@ It is implemented in [utils.py](./code/utils.py) as experience function.
 It is implemented in [network.py](./code/networks.py).
 
 ## Performance
-I 
+- Result of learning 7 atari games as DQN
+![experiment_1](./img/experiment_1.png)
+- Hyper parameter epsilon tuning for BreakOut game<div>
+  <img src="./img/experiment_2.png">
+  <img src="./img/experiment_3.png">
+</div>
