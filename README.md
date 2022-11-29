@@ -1,13 +1,3 @@
-# playing_atari_with_deep_reinforcement_learning
-<div>
-  <img src="https://user-images.githubusercontent.com/33629459/204558192-69946810-c81f-46b7-b76e-2f99cf0dc280.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/204559261-0a8c1c93-c634-4639-b4de-8dec370f3a98.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/204559552-5a247675-a4a4-4b99-9e2f-b894c47d31e0.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/204559763-b5bd2840-c215-4a63-83a4-04cd251940f6.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/204559927-7afd441b-3743-47c0-89aa-7dfcb3e183fd.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/204560084-25783678-7eae-4d50-a2a3-a0dcac596796.mp4">
-</div>
-
 ## INDEX
 - [Project Purpose](#project-purpose)
 - [Environment](#environment)
@@ -19,6 +9,14 @@
 - [Performance](#performance)
 
 ## Project Purpose
+<div>
+  <img src="https://user-images.githubusercontent.com/33629459/204558192-69946810-c81f-46b7-b76e-2f99cf0dc280.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204559261-0a8c1c93-c634-4639-b4de-8dec370f3a98.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204559552-5a247675-a4a4-4b99-9e2f-b894c47d31e0.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204559763-b5bd2840-c215-4a63-83a4-04cd251940f6.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204559927-7afd441b-3743-47c0-89aa-7dfcb3e183fd.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/204560084-25783678-7eae-4d50-a2a3-a0dcac596796.mp4">
+</div>
 The ultimate goal of this project is to implement atari game player by reinforcement learning algorithm DQN.
 
 ## Environment
