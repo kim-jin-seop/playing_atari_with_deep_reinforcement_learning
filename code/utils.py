@@ -36,7 +36,7 @@ class ChangeImageAxis(gym.ObservationWrapper):
     def observation(self, observation):
         return np.moveaxis(observation, -1, 0)
 
-
+# for 4 Frame
 class FromBuffer(gym.ObservationWrapper):
     def __init__(self, env):
         super(FromBuffer, self).__init__(env)
