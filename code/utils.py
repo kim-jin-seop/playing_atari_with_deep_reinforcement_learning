@@ -99,7 +99,7 @@ def experiment(env_name: str, action_num: int, learning_rate=1e-5,
             print_score += reward
 
             if len(memory) > 10000:
-                update(q, q_target, memory, optimizer, epoch, div, batch_size, gamma)
+                update(q, q_target, memory, optimizer, div, batch_size, gamma)
 
             if finish:
                 break
@@ -107,15 +107,14 @@ def experiment(env_name: str, action_num: int, learning_rate=1e-5,
         episode_list.append(epoch)
         reward_list.append(print_score)
         eps_list.append(eps * 100)
+        if epoch % 10:
+            q_target.load_state_dict(q.state_dict())
 
     df = pd.DataFrame({'episode': episode_list, 'reward': reward_list, 'epsilon': eps_list})
     df.to_csv(csv_name, index=False, mode='w')
 
 
-def update(q, q_target, memory, optimizer, epoch, div, batch_size=32, gamma=0.98):
-    if epoch % 1000:
-        q_target.load_state_dict(q.state_dict())
-
+def update(q, q_target, memory, optimizer, div, batch_size=32, gamma=0.98):
     state, action, reward, next_state, finish = memory.sample(batch_size)
     state = torch.from_numpy(np.float32(state)).to(div)
     action = torch.from_numpy(np.int64(action)).to(div)
