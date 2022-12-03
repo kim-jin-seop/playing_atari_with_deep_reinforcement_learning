@@ -107,7 +107,7 @@ def experiment(env_name: str, action_num: int, learning_rate=1e-5,
         episode_list.append(epoch)
         reward_list.append(print_score)
         eps_list.append(eps * 100)
-        if epoch % 10:
+        if epoch % 100:
             q_target.load_state_dict(q.state_dict())
 
     df = pd.DataFrame({'episode': episode_list, 'reward': reward_list, 'epsilon': eps_list})
