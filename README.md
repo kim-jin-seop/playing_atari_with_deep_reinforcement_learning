@@ -9,12 +9,10 @@
 - [Performance](#performance)
 
 ## Project Purpose
-<div>
-  <img src="https://user-images.githubusercontent.com/33629459/205552909-e508b085-545a-4dde-9078-a3672d793de4.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/205553002-eaebdb08-3d9d-425a-93b6-8595da8f3cc0.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/205553036-1b73d90f-64a9-4240-82f9-7f5fb506bc61.mp4">
-  <img src="https://user-images.githubusercontent.com/33629459/205552975-c12e25f2-7918-40b4-beb9-d5d0ec78ca9e.mp4">
-</div>
+![openaigym video 0 7148 video000512](https://user-images.githubusercontent.com/33629459/205553659-a63d3da5-c286-4316-9eed-c573aee9b230.gif)
+![openaigym video 0 43520 video001000](https://user-images.githubusercontent.com/33629459/205553663-649a29a1-0749-43cd-b0a2-4b989d04354c.gif)
+![openaigym video 0 166456 video000512](https://user-images.githubusercontent.com/33629459/205553664-aa9bf678-62b8-4503-b310-5831f0c7f2a6.gif)
+![openaigym video 0 64488 video003000](https://user-images.githubusercontent.com/33629459/205553668-28285fad-67dc-466b-bb10-c6d173cfd85d.gif)
 
 The ultimate goal of this project is to implement atari game player by reinforcement learning algorithm DQN.
 
