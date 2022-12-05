@@ -10,14 +10,12 @@
 
 ## Project Purpose
 <div>
-  <img src="./resource/video/breakout.mp4">
-  <img src="./resource/video/b_rider.mp4">
-  <img src="./resource/video/enduro.mp4">
-  <img src="./resource/video/pong.mp4">
-  <img src="./resource/video/qbert.mp4">
-  <img src="./resource/video/s_invaders.mp4">
-  <img src="./resource/video/seaquest.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/205552909-e508b085-545a-4dde-9078-a3672d793de4.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/205553002-eaebdb08-3d9d-425a-93b6-8595da8f3cc0.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/205553036-1b73d90f-64a9-4240-82f9-7f5fb506bc61.mp4">
+  <img src="https://user-images.githubusercontent.com/33629459/205552975-c12e25f2-7918-40b4-beb9-d5d0ec78ca9e.mp4">
 </div>
+
 The ultimate goal of this project is to implement atari game player by reinforcement learning algorithm DQN.
 
 ## Environment
