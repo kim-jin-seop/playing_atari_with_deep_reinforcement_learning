@@ -18,5 +18,8 @@ class ReplayBuffer:
         return (np.array(s_list), np.array(a_list), np.array(r_list, dtype=np.float32),
                 np.array(n_s_list), np.array(done_list, dtype=np.uint8))
 
+    def clean(self):
+        self.buffer.clear()
+
     def __len__(self):
         return len(self.buffer)

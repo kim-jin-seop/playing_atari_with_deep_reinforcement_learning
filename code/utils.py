@@ -113,6 +113,50 @@ def experiment(env_name: str, action_num: int, learning_rate=1e-5,
     df = pd.DataFrame({'episode': episode_list, 'reward': reward_list, 'epsilon': eps_list})
     df.to_csv(csv_name, index=False, mode='w')
 
+def recent_experiment(env_name: str, action_num: int, learning_rate=1e-5,
+               epochs: int = 10000, batch_size: int = 32, gamma: float = 0.98,
+               eps_init: float = 1, eps_grad: float = 0.2, eps_min: float = 0.01,
+               csv_name: str = 'test.csv', vidio_path: str = './monitor'):
+    div = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    env = make_env(env_name, vidio_path=vidio_path)
+    memory = ReplayBuffer(20000)
+    show_episode = 50
+
+    q = networks.DQN(action_num).to(div)
+    q_target = networks.DQN(action_num).to(div)
+
+    optimizer = optim.Adam(q.parameters(), lr=learning_rate)
+
+    episode_list = []
+    reward_list = []
+    eps_list = []
+    for epoch in range(epochs):
+        print_score = 0.0
+        eps = max(eps_min, eps_init - 0.01 * (epoch / (1 / eps_grad)))
+        state = env.reset()
+
+        while True:
+            action = q.sample_action(torch.from_numpy(np.float32(state)).unsqueeze(0).to(div), eps)
+            next_state, reward, finish, _ = env.step(action)
+            memory.put(state, action, reward, next_state, finish)
+            state = next_state
+            print_score += reward
+            if finish:
+                break
+        if epoch % show_episode == 0 and epoch != 0:
+            for i in range(200):
+                update(q, q_target, memory, optimizer, div, batch_size, gamma)
+            memory.clean()
+        print("n_episode :{}, score : {:.1f}, eps : {:.1f}%".format(epoch, print_score, eps * 100))
+        episode_list.append(epoch)
+        reward_list.append(print_score)
+        eps_list.append(eps * 100)
+        if epoch % 20 == 0:
+            q_target.load_state_dict(q.state_dict())
+
+    df = pd.DataFrame({'episode': episode_list, 'reward': reward_list, 'epsilon': eps_list})
+    df.to_csv(csv_name, index=False, mode='w')
+
 
 def update(q, q_target, memory, optimizer, div, batch_size=32, gamma=0.98):
     state, action, reward, next_state, finish = memory.sample(batch_size)
