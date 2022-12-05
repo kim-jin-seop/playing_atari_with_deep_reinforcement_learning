@@ -120,7 +120,6 @@ def recent_experiment(env_name: str, action_num: int, learning_rate=1e-5,
     div = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     env = make_env(env_name, vidio_path=vidio_path)
     memory = ReplayBuffer(20000)
-    show_episode = 50
 
     q = networks.DQN(action_num).to(div)
     q_target = networks.DQN(action_num).to(div)
@@ -130,24 +129,34 @@ def recent_experiment(env_name: str, action_num: int, learning_rate=1e-5,
     episode_list = []
     reward_list = []
     eps_list = []
+
+    actions = 0
+    eps_count = 0
     for epoch in range(epochs):
         print_score = 0.0
+        eps_count += 1
+        action_count = 0
         eps = max(eps_min, eps_init - 0.01 * (epoch / (1 / eps_grad)))
         state = env.reset()
 
         while True:
+            action_count += 1
             action = q.sample_action(torch.from_numpy(np.float32(state)).unsqueeze(0).to(div), eps)
             next_state, reward, finish, _ = env.step(action)
             memory.put(state, action, reward, next_state, finish)
             state = next_state
             print_score += reward
             if finish:
+                actions += action_count
                 break
-        if epoch % show_episode == 0 and epoch != 0:
-            for i in range(200):
+        if len(memory) > 10000:
+            for i in range(actions//eps_count):
+                actions = 0
+                eps_count = 0
                 update(q, q_target, memory, optimizer, div, batch_size, gamma)
             memory.clean()
-        print("n_episode :{}, score : {:.1f}, eps : {:.1f}%".format(epoch, print_score, eps * 100))
+        print("n_episode :{}, score : {:.1f}, eps : {:.1f}%, memory : {}, actions : {}".format(epoch, print_score, eps * 100, len(memory), action_count))
+        action_count = 0
         episode_list.append(epoch)
         reward_list.append(print_score)
         eps_list.append(eps * 100)
