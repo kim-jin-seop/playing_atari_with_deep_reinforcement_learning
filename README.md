@@ -13,6 +13,8 @@
 ![openaigym video 0 43520 video001000](https://user-images.githubusercontent.com/33629459/205553663-649a29a1-0749-43cd-b0a2-4b989d04354c.gif)
 ![openaigym video 0 166456 video000512](https://user-images.githubusercontent.com/33629459/205553664-aa9bf678-62b8-4503-b310-5831f0c7f2a6.gif)
 ![openaigym video 0 64488 video003000](https://user-images.githubusercontent.com/33629459/205553668-28285fad-67dc-466b-bb10-c6d173cfd85d.gif)
+![openaigym video 1 7148 video002000](https://user-images.githubusercontent.com/33629459/205553929-1957b647-f0c1-4892-9d3c-2fedbe3013c1.gif)
+
 
 The ultimate goal of this project is to implement atari game player by reinforcement learning algorithm DQN.
 
